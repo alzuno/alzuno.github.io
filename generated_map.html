@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated Map</title>
+
+    <!-- Embed journey data -->
+    <script>
+        var journeys = {"journeys": [{"id": 1, "name": "Journey 1", "start_date": "2023-01-01", "end_date": "2023-01-10", "info": "This is journey 1. It covers various locations.", "latitude": [37.7749, 37.775, 37.7751, 37.7752, 37.7753, 37.7754, 37.7755, 37.7756, 37.7757, 37.7758], "longitude": [-122.4194, -122.4195, -122.4196, -122.4197, -122.4198, -122.4199, -122.42, -122.4201, -122.4202, -122.4203]}, {"id": 2, "name": "Journey 2", "start_date": "2023-02-01", "end_date": "2023-02-15", "info": "This is journey 2. It spans a longer duration.", "latitude": [34.0522, 34.0523, 34.0524, 34.0525, 34.0526, 34.0527, 34.0528, 34.0529, 34.053, 34.0531, 34.0532], "longitude": [-118.2437, -118.2438, -118.2439, -118.244, -118.2441, -118.2442, -118.2443, -118.2444, -118.2445, -118.2446, -118.2447]}, {"id": 3, "name": "Journey 3", "start_date": "2023-03-01", "end_date": "2023-03-20", "info": "This is journey 3. It covers various terrains.", "latitude": [40.7128, 40.7129, 40.713, 40.7131, 40.7132, 40.7133, 40.7134, 40.7135, 40.7136, 40.7137, 40.7138], "longitude": [-74.006, -74.0061, -74.0062, -74.0063, -74.0064, -74.0065, -74.0066, -74.0067, -74.0068, -74.0069, -74.007]}]};
+    </script>
+
+    <!-- Include Leaflet CSS and JavaScript -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body style="display: flex; height: 100vh; margin: 0;">
+
+    <div style="flex: 1; padding: 10px;">
+        <h1>Journeys</h1>
+        <ul>
+        <li><a href='#' onclick='showJourney(1)'>Journey 1</a></li>
+        <li><a href='#' onclick='showJourney(2)'>Journey 2</a></li>
+        <li><a href='#' onclick='showJourney(3)'>Journey 3</a></li>
+
+        </ul>
+
+        <div id="details">
+            <h2>Journeys</h2>
+            <div id="detailsContent"></div>
+        </div>
+    </div>
+
+    <div id="map" style="flex: 2; height: 100vh;"></div>
+
+    <script>
+        var map = L.map('map').setView([0, 0], 2);  // Default view
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        function showJourney(journeyId) {
+            // Fetch journey data or use it directly from the provided JSON
+            var journey = findJourneyById(journeyId);
+
+            // Clear existing layers on the map
+            map.eachLayer(function (layer) {
+                if (layer instanceof L.Polyline) {
+                    map.removeLayer(layer);
+                }
+            });
+
+            // Add polyline to the map for the selected journey
+            var coordinates = [];
+            for (var i = 0; i < journey.latitude.length; i++) {
+                coordinates.push([journey.latitude[i], journey.longitude[i]]);
+            }
+
+            L.polyline(coordinates, { color: 'blue' }).addTo(map);
+
+            // Pan and zoom to fit the polyline
+            map.fitBounds(coordinates);
+
+            // Update journey details frame
+            updateJourneyDetails(journey);
+        }
+
+        function findJourneyById(journeyId) {
+            // Find the journey by ID in the provided JSON data
+            return journeys.journeys.find(function(journey) {
+                return journey.id === journeyId;
+            });
+        }
+
+        function updateJourneyDetails(journey) {
+            // Update journey details in the details frame
+            var detailsContent = `<strong>Name:</strong> ${journey['name']}<br>`;
+            detailsContent += `<strong>Start Date:</strong> ${journey['start_date']}<br>`;
+            detailsContent += `<strong>End Date:</strong> ${journey['end_date']}<br>`;
+
+            // Display "info" section if available
+            if (journey['info']) {
+                detailsContent += `<strong>Info:</strong> ${journey['info']}<br>`;
+            }
+
+            // Add more details as needed
+
+            document.getElementById('detailsContent').innerHTML = detailsContent;
+        }
+    </script>
+</body>
+</html>
